@@ -398,11 +398,4 @@ app.post("/api/translate", async (req, res) => {
 // START SERVER
 // ======================================================
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-
-  console.log(
-    `Backend running on http://localhost:${PORT}`
-  );
-
-});
+module.exports = app;
