@@ -1,0 +1,8 @@
+node_modules/
+translator-env/
+.venv/
+.env
+*.db
+__pycache__/
+*.pyc
+dist/
