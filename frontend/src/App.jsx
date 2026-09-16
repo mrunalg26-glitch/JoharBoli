@@ -1,6 +1,145 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
+// Instant demo translations for the live presentation.
+// Real backend/AI translation remains the fallback for other text.
+const DEMO_TRANSLATIONS = {
+  "ability": "जोगमान",
+  "hello": "ᱡᱚᱦᱟᱨ",
+  "hello.": "ᱡᱚᱦᱟᱨ ᱾",
+  "thank you": "ᱥᱟᱹᱨᱦᱟᱣ",
+  "thank you.": "ᱥᱟᱹᱨᱦᱟᱣ ᱾",
+  "water": "ᱫᱟᱜ",
+  "school": "ᱥᱠᱩᱞ",
+  "book": "ᱯᱩᱛᱷᱤ",
+  "home": "ᱚᱲᱟᱜ",
+  "child": "ᱠᱩᱲᱤ",
+  "help": "ᱜᱚᱲᱚ",
+  "name": "ᱧᱩᱛᱩᱢ",
+  "good": "ᱵᱮᱥ",
+  "नमस्ते।": "ᱡᱚᱦᱟᱨ ᱾",
+  "आप कैसे हैं?": "ᱟᱢ ᱥᱮᱞᱮᱫ ᱢᱮᱱᱟᱢᱟ?",
+  "मेरा नाम मृणाल है।": "ᱤᱧᱟᱹᱜ ᱧᱩᱛᱩᱢ ᱢᱨᱩᱱᱟᱞ ᱠᱟᱱᱟ ᱾",
+  "आपका नाम क्या है?": "ᱟᱢᱟᱜ ᱧᱩᱛᱩᱢ ᱚᱠᱟ ᱠᱟᱱᱟ?",
+  "धन्यवाद।": "ᱥᱟᱹᱨᱦᱟᱣ ᱾",
+  "कृपया मेरी मदद करें।": "ᱫᱟᱭᱟ ᱠᱟᱛᱮ ᱤᱧ ᱮᱢ ᱜᱚᱲᱚ ᱢᱮ ᱾",
+  "यह क्या है?": "ᱱᱚᱣᱟ ᱚᱠᱟ ᱠᱟᱱᱟ?",
+  "मुझे पानी चाहिए।": "ᱤᱧ ᱫᱟᱜ ᱥᱟᱵ ᱢᱮᱱᱟᱜᱼᱟ ᱾",
+  "मैं स्कूल जा रहा हूँ।": "ᱤᱧ ᱥᱠᱩᱞ ᱥᱮᱫ ᱠᱟᱱᱟᱹᱧ ᱾",
+  "बच्चे स्कूल जा रहे हैं।": "ᱠᱩᱲᱤ ᱠᱚ ᱥᱠᱩᱞ ᱥᱮᱫ ᱠᱟᱱᱟ ᱾",
+  "किताब पढ़ो।": "ᱯᱩᱛᱷᱤ ᱯᱟᱲᱦᱟᱣ ᱢᱮ ᱾",
+  "यह मेरा घर है।": "ᱱᱚᱣᱟ ᱤᱧᱟᱹᱜ ᱚᱲᱟᱜ ᱠᱟᱱᱟ ᱾",
+};
+
+function InfoPage({ type, darkMode, setPage }) {
+  const content = {
+    offline: {
+      icon: "⬇️",
+      title: "Offline Mode",
+      subtitle: "Use JoharBoli without internet",
+      text: "Offline support is part of JoharBoli's roadmap. The current prototype is being prepared for full offline operation on low-cost devices.",
+      points: [
+        "Offline translation model",
+        "Offline worksheets and phrasebook",
+        "Low-cost Android support",
+        "Sync when internet is available",
+      ],
+    },
+    image: {
+      icon: "🖼️",
+      title: "Image Translation",
+      subtitle: "Translate text from learning materials",
+      text: "Image-based translation is planned for a future version of JoharBoli.",
+      points: [
+        "Capture or upload an image",
+        "Detect text from the image",
+        "Translate into the selected language",
+        "Support classroom learning materials",
+      ],
+    },
+  }[type];
+
+  const isAbout = type === "about";
+
+  return (
+    <div className={`app ${darkMode ? "dark-mode" : ""}`}>
+      <aside className="sidebar">
+        <div className="brand">
+          <div className="brand-icon">🌿</div>
+          <h1>Johar<span>Boli</span></h1>
+          <p>Bridging Languages<br />Building Futures</p>
+        </div>
+
+        <nav>
+          <button className="nav-item" onClick={() => setPage("translator")}>🏠 <span>Translator</span></button>
+          <button className="nav-item" onClick={() => setPage("translator")}>📄 <span>Worksheet</span></button>
+          <button className="nav-item" onClick={() => setPage("phrasebook")}>📖 <span>Phrasebook</span></button>
+          <button className={`nav-item ${type === "offline" ? "active" : ""}`} onClick={() => setPage("offline")}>⬇️ <span>Offline Mode</span></button>
+          <button className={`nav-item ${isAbout ? "active" : ""}`} onClick={() => setPage("about")}>ℹ️ <span>About</span></button>
+        </nav>
+
+        <div className="sidebar-bottom">
+          <span>© JoharBoli. All rights reserved.</span>
+          <button className="theme-toggle" onClick={() => window.dispatchEvent(new CustomEvent("toggle-joharboli-theme"))}>
+            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+          </button>
+        </div>
+      </aside>
+
+      <main className="main">
+        <header className="top-header">
+          <div>
+            <h2>{isAbout ? "About " : "JoharBoli "}<span>{isAbout ? "JoharBoli" : content.title}</span></h2>
+            <p>{isAbout ? "Our mission • Our technology • Our vision" : content.subtitle}</p>
+          </div>
+          <div className="offline-badge">{isAbout ? "🌿 AI for Inclusive Education" : "🚧 Coming Soon"}</div>
+        </header>
+
+        {isAbout ? (
+          <section className="result-section">
+            <div className="result-header"><h2>🌿 What is JoharBoli?</h2></div>
+            <div className="empty-result" style={{ textAlign: "left", lineHeight: 1.7 }}>
+              <p><strong>JoharBoli</strong> is an AI-powered language and learning platform designed to support mother-tongue-based primary education by connecting Hindi with tribal languages.</p>
+              <h3>🎯 Mission</h3>
+              <p>To make learning more accessible by helping teachers and children learn and communicate in their mother tongue.</p>
+              <h3>✨ What JoharBoli Offers</h3>
+              <ul>
+                <li>Hindi → Santali translation</li>
+                <li>Voice-based input and speech</li>
+                <li>Santali text-to-speech</li>
+                <li>Bilingual learning worksheets</li>
+                <li>Phrasebook and learning activities</li>
+                <li>Offline support — Coming Soon</li>
+              </ul>
+              <h3>🤖 AI Technology</h3>
+              <p>Speech → AI Translation → Santali Text → Voice</p>
+              <p><strong>AI4Bharat IndicTrans2</strong> • <strong>AI4Bharat Indic Parler-TTS</strong> • React • Node.js + Express • SQLite</p>
+              <h3>💡 Why JoharBoli?</h3>
+              <p>Language should not be a barrier to education. JoharBoli aims to preserve tribal languages while making classroom learning easier and more inclusive.</p>
+              <p><strong>Bridging Languages • Building Futures</strong></p>
+            </div>
+          </section>
+        ) : (
+          <section className="result-section">
+            <div className="result-header"><h2>{content.icon} {content.title}</h2></div>
+            <div className="empty-result">
+              <div style={{ fontSize: "3rem", marginBottom: "12px" }}>{content.icon}</div>
+              <h2>Coming Soon</h2>
+              <p>{content.text}</p>
+              <ul style={{ textAlign: "left", maxWidth: "520px", margin: "20px auto", lineHeight: 1.8 }}>
+                {content.points.map((point) => <li key={point}>{point}</li>)}
+              </ul>
+              <button className="translate-main" onClick={() => setPage("translator")}>← Back to Translation</button>
+            </div>
+          </section>
+        )}
+
+        <footer>JoharBoli &nbsp; | &nbsp; Built for People, Rooted in India</footer>
+      </main>
+    </div>
+  );
+}
+
 function App() {
   const [page, setPage] = useState("translator");
 
@@ -191,6 +330,27 @@ function App() {
 
     setLoading(true);
     stopSpeaking();
+
+    // Instant local demo path: no network/model wait for prepared demo phrases.
+    // This keeps the live presentation fast while preserving the real AI fallback.
+    const demoKey = cleanText.toLowerCase();
+    const demoTranslation = DEMO_TRANSLATIONS[cleanText] || DEMO_TRANSLATIONS[demoKey];
+
+    if (
+      sourceLanguage !== targetLanguage &&
+      demoTranslation &&
+      targetLanguage === "Santhali"
+    ) {
+      setResult({
+        text: cleanText,
+        sourceLanguage,
+        targetLanguage,
+        translation: demoTranslation,
+        source: "instant-demo",
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -672,6 +832,22 @@ Generated by JoharBoli
     };
   }, []);
 
+  useEffect(() => {
+    const handler = () => setDarkMode((current) => !current);
+    window.addEventListener("toggle-joharboli-theme", handler);
+    return () => window.removeEventListener("toggle-joharboli-theme", handler);
+  }, []);
+
+  if (page === "offline" || page === "image" || page === "about") {
+    return (
+      <InfoPage
+        type={page}
+        darkMode={darkMode}
+        setPage={setPage}
+      />
+    );
+  }
+
   /* =====================================================
      PHRASEBOOK PAGE
   ===================================================== */
@@ -728,12 +904,18 @@ Generated by JoharBoli
               <span>Phrasebook</span>
             </button>
 
-            <button className="nav-item">
+            <button
+              className={`nav-item ${page === "offline" ? "active" : ""}`}
+              onClick={() => setPage("offline")}
+            >
               ⬇️
               <span>Offline Mode</span>
             </button>
 
-            <button className="nav-item">
+            <button
+              className={`nav-item ${page === "about" ? "active" : ""}`}
+              onClick={() => setPage("about")}
+            >
               ℹ️
               <span>About</span>
             </button>
@@ -743,14 +925,14 @@ Generated by JoharBoli
           <div className="sidebar-bottom">
 
             <p>
-              For Inclusive
+             
               <br />
-              Education & Empowered
+              ©
               <br />
-              Communities
+             
             </p>
 
-            <span>❤️</span>
+            <span></span>
 
             <button
               className="theme-toggle"
@@ -970,9 +1152,8 @@ Generated by JoharBoli
           </section>
 
           <footer>
-            JoharBoli &nbsp; | &nbsp;
-            Built for People, Powered by AI,
-            Rooted in India ❤️
+            JoharBoli &nbsp;  &nbsp;
+            
           </footer>
 
         </main>
@@ -1038,12 +1219,18 @@ Generated by JoharBoli
             <span>Phrasebook</span>
           </button>
 
-          <button className="nav-item">
+          <button
+            className={`nav-item ${page === "offline" ? "active" : ""}`}
+            onClick={() => setPage("offline")}
+          >
             ⬇️
             <span>Offline Mode</span>
           </button>
 
-          <button className="nav-item">
+          <button
+            className={`nav-item ${page === "about" ? "active" : ""}`}
+            onClick={() => setPage("about")}
+          >
             ℹ️
             <span>About</span>
           </button>
@@ -1052,15 +1239,8 @@ Generated by JoharBoli
 
         <div className="sidebar-bottom">
 
-          <p>
-            For Inclusive
-            <br />
-            Education & Empowered
-            <br />
-            Communities
-          </p>
-
-          <span>❤️</span>
+          
+          <span> ©  JoharBoli. All rights reserved.</span>
 
           <button
             className="theme-toggle"
@@ -1099,8 +1279,12 @@ Generated by JoharBoli
 
           </div>
 
-          <div className="offline-badge">
-            🟢 Offline Ready
+          <div
+            className="offline-badge"
+            onClick={() => setPage("offline")}
+            style={{ cursor: "pointer" }}
+          >
+            🟡 Offline Coming Soon
           </div>
 
         </header>
@@ -1112,14 +1296,13 @@ Generated by JoharBoli
             <div className="tabs">
 
               <button className="tab active">
-                📝 Text Translation
+                🌐 Translation
               </button>
 
-              <button className="tab">
-                🎙️ Voice Translation
-              </button>
-
-              <button className="tab">
+              <button
+                className="tab"
+                onClick={() => setPage("image")}
+              >
                 🖼️ Image Translation
               </button>
 
@@ -1514,7 +1697,10 @@ Generated by JoharBoli
 
           </button>
 
-          <button className="quick-card offline">
+          <button
+            className="quick-card offline"
+            onClick={() => setPage("offline")}
+          >
 
             <div className="quick-icon">
               ⬇️
@@ -1523,6 +1709,7 @@ Generated by JoharBoli
             <div>
               <h3>
                 Download for Offline Use
+              
               </h3>
 
               <p>
@@ -1539,7 +1726,7 @@ Generated by JoharBoli
         <footer>
           JoharBoli &nbsp; | &nbsp;
           Built for People,
-          Rooted in India ❤️
+          Rooted in India 
         </footer>
 
       </main>
