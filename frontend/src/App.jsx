@@ -354,7 +354,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/translate",
+        "https://joharboli.onrender.com/api/translate",
         {
           method: "POST",
           headers: {
